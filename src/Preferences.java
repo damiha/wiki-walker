@@ -3,11 +3,14 @@ import java.util.Set;
 
 public class Preferences {
 
+    private SearchAlgorithm searchAlgorithm;
     private SearchDirection searchDirection;
     private final Set<Heuristic> heuristics;
     private int maxLinksAtNode;
 
     public Preferences(){
+
+        searchAlgorithm = SearchAlgorithm.breadth_first_search;
         searchDirection = SearchDirection.unidirectional;
         heuristics = new HashSet<Heuristic>();
 
@@ -30,6 +33,8 @@ public class Preferences {
                 return;
             case "search_direction":
                 searchDirection = SearchDirection.valueOf(valueString);
+            case "search_algorithm":
+                searchAlgorithm = SearchAlgorithm.valueOf(valueString);
                 return;
         }
 
@@ -46,6 +51,7 @@ public class Preferences {
 
     public String toString(){
         StringBuilder sb = new StringBuilder();
+        sb.append(Main.indentation + "search_algorithm: " + searchAlgorithm + "\n");
         sb.append(Main.indentation + "search_direction: " + searchDirection + "\n");
         sb.append(Main.indentation + "max_links_at_node: " + maxLinksAtNode + "\n");
 
@@ -56,6 +62,10 @@ public class Preferences {
             sb.append(Main.indentation + " - " + heuristic.toString().toLowerCase() + ": " + status + "\n");
         }
         return sb.toString();
+    }
+
+    public SearchAlgorithm getSearchAlgorithm() {
+        return searchAlgorithm;
     }
 
     public SearchDirection getSearchDirection() {

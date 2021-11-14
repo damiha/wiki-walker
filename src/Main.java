@@ -118,6 +118,10 @@ public class Main {
         return s.toLowerCase().trim();
     }
 
+    public static String format(String string){
+        return string.replace(" ", "_");
+    }
+
     public static void main(String[] args) throws IOException, InterruptedException {
 
         Main main = new Main();
