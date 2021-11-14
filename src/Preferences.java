@@ -1,27 +1,53 @@
 import java.util.HashSet;
 import java.util.Set;
 
-enum SearchDirection{
-    UNIDIRECTIONAL, BIDIRECTIONAL;
-}
-
-enum Heuristic{
-    MOST_CATEGORIES_MATCHING;
-}
-
 public class Preferences {
 
     private SearchDirection searchDirection;
-    private Set<Heuristic> heuristics;
+    private final Set<Heuristic> heuristics;
+    private int maxLinksAtNode;
 
     public Preferences(){
-        searchDirection = SearchDirection.UNIDIRECTIONAL;
+        searchDirection = SearchDirection.unidirectional;
         heuristics = new HashSet<Heuristic>();
+
+        maxLinksAtNode = 10; /* range [5; 500] */
+    }
+
+    public void setPref(String variableString, String valueString){
+
+        switch(variableString){
+            case "max_links_at_node":
+                int newValue = Integer.parseInt(valueString);
+
+                if(newValue < 5){
+                    newValue = 5;
+                }else if(newValue > 500){
+                    newValue = 500;
+                }
+
+                maxLinksAtNode = newValue;
+                return;
+            case "search_direction":
+                searchDirection = SearchDirection.valueOf(valueString);
+                return;
+        }
+
+        /* assigment must concern heuristics */
+        boolean addHeuristic = Boolean.valueOf(valueString);
+
+        if(addHeuristic){
+            heuristics.add(Heuristic.valueOf(variableString));
+        }
+        else {
+            heuristics.remove(Heuristic.valueOf(variableString));
+        }
     }
 
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append(Main.indentation + "search dir: " + searchDirection + "\n");
+        sb.append(Main.indentation + "search_direction: " + searchDirection + "\n");
+        sb.append(Main.indentation + "max_links_at_node: " + maxLinksAtNode + "\n");
 
         sb.append("\n" + Main.indentation + "heuristics:\n");
         for(Heuristic heuristic : Heuristic.values()){
@@ -30,5 +56,13 @@ public class Preferences {
             sb.append(Main.indentation + " - " + heuristic.toString().toLowerCase() + ": " + status + "\n");
         }
         return sb.toString();
+    }
+
+    public SearchDirection getSearchDirection() {
+        return searchDirection;
+    }
+
+    public int getMaxLinksAtNode(){
+        return maxLinksAtNode;
     }
 }

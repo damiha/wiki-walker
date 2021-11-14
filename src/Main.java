@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -31,6 +32,7 @@ public class Main {
         System.out.println(indentation + "help:" + indentation + "prints this message.");
         System.out.println(indentation + "walk:" + indentation + "reads start- and endpoint. executes the wiki-walk.");
         System.out.println(indentation + "pref:" + indentation + "prints the current preferences.");
+        System.out.println(indentation + "set:" + indentation + "sets a variable in the preferences to a specific value.");
         System.out.println(indentation + "stat:" + indentation + "prints metrics (e.g. #requests, execution time) of the last walk.");
         System.out.println(indentation + "quit:" + indentation + "quits the application.");
     }
@@ -44,7 +46,7 @@ public class Main {
             String startPoint = getStartPoint();
             String endPoint = getEndPoint();
 
-            Walker walker = new Walker(startPoint, endPoint);
+            Walker walker = new Walker(startPoint, endPoint, prefs);
 
         }catch(RuntimeException e){
             System.out.println(indentation + e.getMessage());
@@ -64,6 +66,7 @@ public class Main {
     }
 
     public Command getCommandFrom(String inputString){
+
         switch (inputString){
             case "help":
                 return this::printHelp;
@@ -75,6 +78,8 @@ public class Main {
                 return this::printPrefs;
             case "quit":
                 return this::quit;
+            case "set":
+                return this::setPrefs;
             default:
                 return () -> System.out.println(indentation + "ERROR: invalid command. Type 'help'.");
         }
@@ -92,7 +97,25 @@ public class Main {
 
     public String getInputString(){
         System.out.print("$: ");
-        return scanner.nextLine();
+        return normalize(scanner.nextLine());
+    }
+
+    public void setPrefs(){
+
+        System.out.print(indentation + "variable: ");
+        String variableString = normalize(scanner.nextLine());
+        System.out.print(indentation + "value: ");
+        String valueString = normalize(scanner.nextLine());
+
+        try{
+            prefs.setPref(variableString, valueString);
+        }catch(RuntimeException e){
+            System.out.println(indentation + "ERROR: couldn't set '" + variableString + "' to '" + valueString + "'");
+        }
+    }
+
+    public static String normalize(String s){
+        return s.toLowerCase().trim();
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
