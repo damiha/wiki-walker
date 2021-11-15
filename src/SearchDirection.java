@@ -1,4 +1,4 @@
 
 public enum SearchDirection{
-    unidirectional, bidirectional;
+    uni, bi;
 }

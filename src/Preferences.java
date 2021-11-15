@@ -6,34 +6,32 @@ public class Preferences {
     private SearchAlgorithm searchAlgorithm;
     private SearchDirection searchDirection;
     private final Set<Heuristic> heuristics;
-    private int maxLinksAtNode;
+    private int maxLinks;
+    private int maxReq;
 
     public Preferences(){
 
-        searchAlgorithm = SearchAlgorithm.breadth_first_search;
-        searchDirection = SearchDirection.unidirectional;
+        searchAlgorithm = SearchAlgorithm.bfs;
+        searchDirection = SearchDirection.bi;
         heuristics = new HashSet<Heuristic>();
 
-        maxLinksAtNode = 10; /* range [5; 500] */
+        maxLinks = 10; /* range [5; 500] */
+        maxReq = 200; /* range [100; 1000] */
     }
 
     public void setPref(String variableString, String valueString){
 
         switch(variableString){
-            case "max_links_at_node":
-                int newValue = Integer.parseInt(valueString);
-
-                if(newValue < 5){
-                    newValue = 5;
-                }else if(newValue > 500){
-                    newValue = 500;
-                }
-
-                maxLinksAtNode = newValue;
+            case "max_links":
+                maxLinks = mapToRange(Integer.parseInt(valueString), 5, 500);
                 return;
-            case "search_direction":
+            case "max_req":
+                maxReq = mapToRange(Integer.parseInt(valueString), 100, 1000);
+                return;
+            case "search_dir":
                 searchDirection = SearchDirection.valueOf(valueString);
-            case "search_algorithm":
+                return;
+            case "search":
                 searchAlgorithm = SearchAlgorithm.valueOf(valueString);
                 return;
         }
@@ -49,11 +47,21 @@ public class Preferences {
         }
     }
 
+    private int mapToRange(int value, int from, int to){
+        if(value < from){
+            value = from;
+        }else if(value > to){
+            value = to;
+        }
+        return value;
+    }
+
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append(Main.indentation + "search_algorithm: " + searchAlgorithm + "\n");
-        sb.append(Main.indentation + "search_direction: " + searchDirection + "\n");
-        sb.append(Main.indentation + "max_links_at_node: " + maxLinksAtNode + "\n");
+        sb.append(Main.indentation + "search: " + searchAlgorithm + "\n");
+        sb.append(Main.indentation + "search_dir: " + searchDirection + "\n");
+        sb.append(Main.indentation + "max_links: " + maxLinks + "\n");
+        sb.append(Main.indentation + "max_req: " + maxReq + "\n");
 
         sb.append("\n" + Main.indentation + "heuristics:\n");
         for(Heuristic heuristic : Heuristic.values()){
@@ -72,7 +80,11 @@ public class Preferences {
         return searchDirection;
     }
 
-    public int getMaxLinksAtNode(){
-        return maxLinksAtNode;
+    public int getMaxLinks(){
+        return maxLinks;
+    }
+
+    public int getMaxReq(){
+        return maxReq;
     }
 }
