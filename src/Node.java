@@ -1,6 +1,12 @@
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 public class Node {
 
     private final String title;
+    private final Set<String> categories;
     private double cost;
 
     private Node parent;
@@ -8,11 +14,17 @@ public class Node {
 
     public Node(String title){
         this.title = title;
+        this.categories = new HashSet<>();
+
         this.cost = Double.POSITIVE_INFINITY;
     }
     public Node(String title,double cost){
-        this.title = title;
+        this(title);
         this.cost = cost;
+    }
+
+    public void addCategory(String category){
+        categories.add(category);
     }
 
     public void setParent(Node parent){

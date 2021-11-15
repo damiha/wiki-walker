@@ -7,6 +7,7 @@ public class Walker {
 
     /* administrative */
     private final Preferences prefs;
+    private final Statistics stats;
     private final WalkerUtils walkerUtils;
 
     private final Node startNode;
@@ -15,12 +16,13 @@ public class Walker {
 
     private final AtomicBoolean found;
 
-    public Walker(String startPoint, String endPoint, Preferences prefs){
+    public Walker(Preferences prefs, Statistics stats, String startPoint, String endPoint){
 
         startNode = new Node(startPoint, 0);
         endNode = new Node(endPoint);
 
         this.prefs = prefs;
+        this.stats = stats;
         this.walkerUtils = new WalkerUtils(prefs, startNode, endNode);
 
         if(walkerUtils.pageNotFound(startPoint)){
@@ -48,6 +50,7 @@ public class Walker {
         if(found.get()){
             walkerUtils.printSolution();
         }
+        stats.setNumberOfRequests(walkerUtils.getNumberRequests());
     }
 
     private void unidirectional_walk(Direction direction){
@@ -60,8 +63,8 @@ public class Walker {
         if(prefs.getSearchAlgorithm() == SearchAlgorithm.bfs){
             queue = new LinkedList<>();
         }else if(prefs.getSearchAlgorithm() == SearchAlgorithm.gbfs){
-            // TODO: add comparator later
-            queue = new PriorityQueue<>();
+
+            queue = new PriorityQueue<>(walkerUtils.getCostComparator());
         }
 
         queue.add(startNode);

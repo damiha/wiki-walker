@@ -6,7 +6,9 @@ public class Preferences {
     private SearchAlgorithm searchAlgorithm;
     private SearchDirection searchDirection;
     private final Set<Heuristic> heuristics;
+
     private int maxLinks;
+    private int maxCategories;
     private int maxReq;
 
     public Preferences(){
@@ -17,6 +19,7 @@ public class Preferences {
 
         maxLinks = 10; /* range [5; 500] */
         maxReq = 200; /* range [100; 1000] */
+        maxCategories = 5; /* range  [2; 5] more is not feasible */
     }
 
     public void setPref(String variableString, String valueString){
@@ -61,6 +64,7 @@ public class Preferences {
         sb.append(Main.indentation + "search: " + searchAlgorithm + "\n");
         sb.append(Main.indentation + "search_dir: " + searchDirection + "\n");
         sb.append(Main.indentation + "max_links: " + maxLinks + "\n");
+        sb.append(Main.indentation + "max_categories: " + maxCategories + "\n");
         sb.append(Main.indentation + "max_req: " + maxReq + "\n");
 
         sb.append("\n" + Main.indentation + "heuristics:\n");
@@ -86,5 +90,13 @@ public class Preferences {
 
     public int getMaxReq(){
         return maxReq;
+    }
+
+    public boolean mostCategoriesMatchingEnabled(){
+        return heuristics.contains(Heuristic.most_categories_matching);
+    }
+
+    public int getMaxCategories(){
+        return maxCategories;
     }
 }

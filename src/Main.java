@@ -18,12 +18,14 @@ public class Main {
     private boolean running;
 
     private Preferences prefs;
+    private Statistics stats;
 
     public Main(){
         scanner = new Scanner(System.in);
         running = true;
 
         prefs = new Preferences();
+        stats = new Statistics();
     }
 
     public void printHeader(){
@@ -48,7 +50,7 @@ public class Main {
             String startPoint = getStartPoint();
             String endPoint = getEndPoint();
 
-            Walker walker = new Walker(startPoint, endPoint, prefs);
+            Walker walker = new Walker(prefs, stats, startPoint, endPoint);
 
         }catch(RuntimeException e){
             System.out.println(indentation + e.getMessage());
@@ -56,7 +58,7 @@ public class Main {
     }
 
     private void printStats(){
-        System.out.println("printing stats...");
+        stats.printStats();
     }
 
     private void printPrefs(){

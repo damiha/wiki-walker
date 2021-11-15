@@ -53,6 +53,10 @@ public class WalkerUtils {
         return numberOfRequests.get() >= prefs.getMaxReq();
     }
 
+    public int getNumberRequests(){
+        return numberOfRequests.get();
+    }
+
     public Stack<String> getSolution(){
         /* where to begin*/
         Node pointedTo = this.endNode.getParent() != null ? this.endNode : this.startNode;
@@ -127,12 +131,69 @@ public class WalkerUtils {
                 Node expandedNode = new Node(title, cost);
                 expandedNode.setParent(node);
                 expandedNode.setDirection(direction);
+
+                if(prefs.mostCategoriesMatchingEnabled()){
+                    // TODO: DON'T SET CATEGORIES WHEN ALREADY IN THE EXPLORED SET
+                    setCategoriesTo(expandedNode);
+                }
+
                 expandedNodes.add(expandedNode);
 
                 nodesAdded++;
             }
         }
         return expandedNodes;
+    }
+
+    private void setCategoriesTo(Node node){
+
+        HttpResponse response = null;
+        try {
+
+            HttpRequest request = HttpRequest.newBuilder(
+                    URI.create("https://en.wikipedia.org/w/api.php?action=query&titles="
+                            + node.getURLTitle() + "&format=json&prop=categories&cllimit=" + prefs.getMaxCategories()))
+                    .header("accept", "application/json")
+                    .build();
+
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            numberOfRequests.incrementAndGet();
+
+        } catch (InterruptedException | IOException | RuntimeException e) {
+            /* something went totally wrong */
+            return;
+        }
+
+        JSONObject req = new JSONObject(response.body().toString());
+        JSONObject query = req.getJSONObject("query");
+        JSONObject pages = query.getJSONObject("pages");
+        JSONObject page = pages.getJSONObject(pages.keys().next());
+
+        /* page not found ? */
+        if(!page.has("categories")){
+            return;
+        }
+        List<Object> categories = page.getJSONArray("categories").toList();
+
+        int categoriesAdded = 0;
+
+        // add category
+        for (int i = 0; i < categories.size(); i++){
+
+            if(categoriesAdded > prefs.getMaxCategories()){
+                break;
+            }
+
+            HashMap<String, Object> map = (HashMap<String, Object>) (categories.get(i));
+
+            // TODO: filter out generic categories e.g. category: article with video
+
+            if(map.get("ns") == (Integer) 14) {
+
+                node.addCategory((String) map.get("title"));
+                categoriesAdded++;
+            }
+        }
     }
 
     /* forward and backward responses have to be parsed differently */
@@ -157,7 +218,6 @@ public class WalkerUtils {
         }
 
         else{
-            // TODO: implement for going backward ('linkshere') as well
             JSONObject req = new JSONObject(response.body().toString());
             JSONObject query = req.getJSONObject("query");
             JSONObject pages = query.getJSONObject("pages");
@@ -175,5 +235,14 @@ public class WalkerUtils {
         Collections.shuffle(links, random);
 
         return links;
+    }
+
+    public Comparator<Node> getCostComparator(){
+        return new Comparator<Node>() {
+            @Override
+            public int compare(Node o1, Node o2) {
+                return Double.compare(o1.getCost(), o2.getCost());
+            }
+        };
     }
 }
