@@ -1,12 +1,10 @@
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Node {
 
     private final String title;
-    private final Set<String> categories;
+    private final String canonicalTitle;
+    private Set<String> categories;
     private double cost;
 
     private Node parent;
@@ -14,6 +12,7 @@ public class Node {
 
     public Node(String title){
         this.title = title;
+        this.canonicalTitle = this.title.toLowerCase();
         this.categories = new HashSet<>();
 
         this.cost = Double.POSITIVE_INFINITY;
@@ -23,8 +22,16 @@ public class Node {
         this.cost = cost;
     }
 
-    public void addCategory(String category){
-        categories.add(category);
+    public Set<String> getCategories(){
+        return categories;
+    }
+
+    public void setCost(double cost){
+        this.cost = cost;
+    }
+
+    public void setCategories(Set<String> categories){
+        this.categories = categories;
     }
 
     public void setParent(Node parent){
@@ -60,12 +67,15 @@ public class Node {
         return Main.format(title);
     }
 
+    public String getCanonicalTitle(){
+        return canonicalTitle;
+    }
+
     public double getCost(){
         return cost;
     }
 
     public String toString(){
-        return "title: " + getTitle() + ", cost: " + getCost()
-                + ", parent: " + (parent != null ? parent.getTitle() : "null");
+        return getTitle();
     }
 }

@@ -1,4 +1,4 @@
 
 public enum Heuristic{
-    most_categories_matching;
+    hamming, longest_substring, most_categories;
 }

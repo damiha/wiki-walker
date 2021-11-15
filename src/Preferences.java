@@ -7,26 +7,37 @@ public class Preferences {
     private SearchDirection searchDirection;
     private final Set<Heuristic> heuristics;
 
+    private boolean verbose;
+
     private int maxLinks;
     private int maxCategories;
     private int maxReq;
 
     public Preferences(){
 
-        searchAlgorithm = SearchAlgorithm.bfs;
-        searchDirection = SearchDirection.bi;
+        searchAlgorithm = SearchAlgorithm.gbfs;
+        searchDirection = SearchDirection.uni;
         heuristics = new HashSet<Heuristic>();
 
+        heuristics.add(Heuristic.hamming);
+
+        maxCategories = 3; /* range  [2; 5] more is not feasible */
         maxLinks = 10; /* range [5; 500] */
         maxReq = 200; /* range [100; 1000] */
-        maxCategories = 5; /* range  [2; 5] more is not feasible */
+        verbose = true;
     }
 
     public void setPref(String variableString, String valueString){
 
         switch(variableString){
+            case "verbose":
+                verbose = Boolean.parseBoolean(valueString);
+                return;
             case "max_links":
                 maxLinks = mapToRange(Integer.parseInt(valueString), 5, 500);
+                return;
+            case "max_categories":
+                maxCategories = mapToRange(Integer.parseInt(valueString), 2, 10);
                 return;
             case "max_req":
                 maxReq = mapToRange(Integer.parseInt(valueString), 100, 1000);
@@ -61,6 +72,7 @@ public class Preferences {
 
     public String toString(){
         StringBuilder sb = new StringBuilder();
+        sb.append(Main.indentation + "verbose: " + verbose + "\n");
         sb.append(Main.indentation + "search: " + searchAlgorithm + "\n");
         sb.append(Main.indentation + "search_dir: " + searchDirection + "\n");
         sb.append(Main.indentation + "max_links: " + maxLinks + "\n");
@@ -93,7 +105,19 @@ public class Preferences {
     }
 
     public boolean mostCategoriesMatchingEnabled(){
-        return heuristics.contains(Heuristic.most_categories_matching);
+        return heuristics.contains(Heuristic.most_categories);
+    }
+
+    public boolean longestSubstringEnabled(){
+        return heuristics.contains(Heuristic.longest_substring);
+    }
+
+    public boolean hammingEnabled(){
+        return heuristics.contains(Heuristic.hamming);
+    }
+
+    public boolean isVerbose(){
+        return verbose;
     }
 
     public int getMaxCategories(){
