@@ -1,4 +1,4 @@
-## [wiki-walker](https://github.com/damiha/sudoku-solver)
+## [wiki-walker]
 
 Select two wikipages and watch the walker navigate through Wikipedia.
 
